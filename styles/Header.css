@@ -1,0 +1,33 @@
+.Header {
+    height: 7vh;
+    padding: 10px;
+    background-color: #fff;
+    /* filter: blur(5px); */
+    display: flex;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    align-items: center;
+    justify-content: space-around;
+    border-bottom: 1px solid #3d3d3d73;
+    visibility: visible;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.Header .Header_logo span {
+    color: blueviolet;
+    display: inline-block;
+    font-weight: bolder;
+    font-family: cursive;
+}
+
+.Header a,
+.Header .Logout {
+    color: #000000;
+    font-weight: 500;
+    font-size: 15px;
+    margin: 0 10px;
+    cursor: pointer;
+}
