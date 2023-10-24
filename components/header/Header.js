@@ -7,6 +7,7 @@ import { Fragment, useContext, useEffect } from "react";
 
 const Header = () => {
   const { data, setData } = useContext(CustomContext);
+  const router = useRouter();
   const logOut = async () => {
     try {
       const req = await fetch("http://localhost:5000/logout", {
@@ -33,7 +34,6 @@ const Header = () => {
           setData(res);
         } else {
           setData(null);
-          const router = useRouter();
           router.push("/login"); // توجيه إلى صفحة تسجيل الدخول
         }
       } catch (error) {
