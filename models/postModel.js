@@ -5,13 +5,17 @@ const PostSchema = new Schema({
     type: String,
     required: true,
   },
-  descrapition: {
+  description: {
     type: String,
     required: true,
   },
   image: {
-    // type: String,
+    type: String,
     required: false,
   },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
-export const posts = model("posts", PostSchema);
+export const Posts = model("Posts", PostSchema);
