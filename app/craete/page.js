@@ -1,7 +1,8 @@
 "use client";
 import "@/styles/create.css";
-import { useState } from "react";
-import { BsCardImage } from "react-icons/bs";
+import { useContext, useEffect, useState } from "react";
+import { CustomContext } from "../Context";
+import { useRouter } from "next/navigation";
 
 const Create = () => {
   const [title, setTitle] = useState("");
@@ -9,6 +10,8 @@ const Create = () => {
   const [image, setImage] = useState("");
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [empty, setEmpty] = useState(null);
+  const { data } = useContext(CustomContext);
+  const router = useRouter();
   const handleValidation = () => {
     if (title.length > 1 && description.length > 1) {
       setIsButtonEnabled(true);
@@ -16,41 +19,17 @@ const Create = () => {
       setIsButtonEnabled(false);
     }
   };
-  const handleSendPost = async () => {
-    const convertImageToBase64 = (image) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-          resolve(event.target.result);
-        };
-
-        reader.onerror = (error) => {
-          reject(error);
-        };
-
-        reader.readAsDataURL(image);
-      });
-    };
-    // const imageBase64 = await convertImageToBase64(image);
-    const postData = {
-      title,
-      description,
-      //   image: imageBase64,
-    };
+  const handleSendPost = async (formData) => {
     try {
       const req = await fetch("http://localhost:5000/posts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
+        body: formData,
         credentials: "include",
       });
 
       if (req.ok) {
         const res = await req.json();
-        console.log(req, res); // Print the response to check its content
+        console.log(res); // Print the response to check its content
       } else {
         console.error("Request failed with status:", req.status);
       }
@@ -58,7 +37,6 @@ const Create = () => {
       console.error(error);
     }
   };
-
   const createPost = (e) => {
     e.preventDefault();
     if (image === "" || title === "" || description === "") {
@@ -67,16 +45,23 @@ const Create = () => {
       setEmpty(true);
     }
     if (image !== "" && title !== "" && description !== "") {
-      handleSendPost();
+      const formData = new FormData();
+      formData.append("image", image);
+      formData.append("title", title);
+      formData.append("description", description);
+      handleSendPost(formData);
     }
   };
+  useEffect(() => {
+    !data ? router.push("/login") : "";
+  }, [data]);
   return (
     <div className="craete">
-      <form className="craete_container">
+      <form className="craete_container" onSubmit={createPost}>
         <div className="create_post">
           <label htmlFor="title">العنوان</label>
           <input
-            type="title"
+            type="text"
             id="title"
             name="title"
             value={title}
@@ -89,7 +74,7 @@ const Create = () => {
         <div className="create_post">
           <label htmlFor="descrpition">الوصف</label>
           <textarea
-            type="descrpition"
+            type="text"
             id="descrpition"
             name="descrpition"
             value={description}
@@ -100,15 +85,17 @@ const Create = () => {
           />
         </div>
         <div className="create_post">
-          <label htmlFor="image">
-            <BsCardImage className="file_image" />
+          <label htmlFor="image" className="chose_file">
+            اختيار ملف
           </label>
           <input
             id="image"
             type="file"
-            name="image"
             style={{ display: "none" }}
-            onChange={(e) => setImage(e.target.files[0]) & handleValidation()}
+            onChange={(e) => {
+              setImage(e.target.files[0]);
+              handleValidation();
+            }}
           />
         </div>
         {empty === false ? <span>يجب الا يكون اي حقل فارغ</span> : ""}
@@ -116,7 +103,6 @@ const Create = () => {
           <button
             className="btn"
             type="submit"
-            onClick={createPost}
             disabled={!isButtonEnabled}
             style={
               isButtonEnabled === false
